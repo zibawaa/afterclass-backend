@@ -6,6 +6,34 @@ export function createMongoRepository(db, client) {
   const orders = db.collection('orders')
   return {
     listLessons: () => lessons.find({}).toArray(),
+    updateLesson: (id, changes) => lessons.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: changes }, { returnDocument: 'after' }),
+    async completeOrder(orderId, lessonId, space) {
+      const session = client.startSession()
+      try {
+        return await session.withTransaction(async () => {
+          const order = await orders.findOne({ _id: new ObjectId(orderId) }, { session })
+          if (!order) throw httpError(404, 'Order not found.')
+          const selected = order.items.find(item => item.lessonId === lessonId)
+          if (!selected || selected.spaceAfter !== space) throw httpError(400, 'Space value does not match this order.')
+          if (order.status !== 'confirmed') {
+            // The first PUT commits ALL order lines together. Either every
+            // activity is booked, or the transaction changes nothing.
+            for (const item of order.items) {
+              const result = await lessons.updateOne(
+                { _id: new ObjectId(item.lessonId), space: item.spaceBefore, price: item.price },
+                { $set: { space: item.spaceAfter } }, { session },
+              )
+              if (!result.matchedCount) throw httpError(409, 'Availability or price changed. Refresh the catalogue and choose your spaces again.')
+            }
+            await orders.updateOne({ _id: order._id }, { $set: { status: 'confirmed', confirmedAt: new Date() } }, { session })
+          }
+          // Retrying a successful checkout never reduces availability twice.
+          return lessons.findOne({ _id: new ObjectId(lessonId) }, { session })
+        })
+      } finally {
+        await session.endSession()
+      }
+    },
     async createOrder(input) {
       const fingerprint = JSON.stringify({ name: input.name, phone: input.phone, items: input.items })
       const existing = await orders.findOne({ requestId: input.requestId })
