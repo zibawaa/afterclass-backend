@@ -4,6 +4,7 @@ import { logger } from './middleware/logger.js'
 import { imageMiddleware } from './middleware/images.js'
 import { lessonRoutes } from './routes/lessons.js'
 import { cors } from './middleware/cors.js'
+import { httpError, validateId } from './validation.js'
 
 export function createApp({ repository, log = console.log, allowedOrigins = ['http://localhost:5173', 'https://zibawaa.github.io'] }) {
   const app = express()
@@ -17,6 +18,12 @@ export function createApp({ repository, log = console.log, allowedOrigins = ['ht
   })
   app.use('/lessons', lessonRoutes(repository))
   app.get('/teachers', async (req, res) => res.json(await repository.listTeachers()))
+  app.get('/enrolment/:lessonid', async (req, res) => {
+    const lessonId = validateId(req.params.lessonid).toLowerCase()
+    const enrolment = await repository.enrolment(lessonId)
+    if (enrolment === null) throw httpError(404, 'Lesson not found.')
+    res.json({ lessonId, enrolment })
+  })
   app.use('/orders', orderRoutes(repository))
   app.use((req, res) => res.status(404).json({ error: 'Route not found.' }))
   app.use((error, req, res, next) => {

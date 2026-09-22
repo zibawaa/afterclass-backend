@@ -7,6 +7,16 @@ export function createMongoRepository(db, client) {
   const orders = db.collection('orders')
   return {
     ping: () => db.command({ ping: 1 }),
+    async enrolment(lessonId) {
+      if (!await lessons.findOne({ _id: new ObjectId(lessonId) })) return null
+      const result = await orders.aggregate([
+        { $match: { status: 'confirmed', lessonIDs: new ObjectId(lessonId) } },
+        { $unwind: '$items' },
+        { $match: { 'items.lessonId': lessonId } },
+        { $group: { _id: null, total: { $sum: '$items.quantity' } } },
+      ]).toArray()
+      return result[0]?.total || 0
+    },
     listTeachers: () => db.collection('teachers').find({}).sort({ lastName: 1 }).toArray(),
     async listLessons({ query = '', teacherId = '' } = {}) {
       const result = await lessons.find(teacherId ? { teacherId } : {}).toArray()
