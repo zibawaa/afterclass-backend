@@ -1,12 +1,16 @@
 import { ObjectId } from 'mongodb'
 import { httpError } from '../validation.js'
+import { matchesLesson } from '../search.js'
 
 export function createMongoRepository(db, client) {
   const lessons = db.collection('lessons')
   const orders = db.collection('orders')
   return {
     ping: () => db.command({ ping: 1 }),
-    listLessons: () => lessons.find({}).toArray(),
+    async listLessons({ query = '' } = {}) {
+      const result = await lessons.find({}).toArray()
+      return result.filter(lesson => matchesLesson(lesson, query))
+    },
     updateLesson: (id, changes) => lessons.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: changes }, { returnDocument: 'after' }),
     async completeOrder(orderId, lessonId, space) {
       const session = client.startSession()

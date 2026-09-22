@@ -3,7 +3,11 @@ import { httpError, validateId, validateLessonUpdate } from '../validation.js'
 
 export function lessonRoutes(repository) {
   const router = Router()
-  router.get('/', async (req, res) => res.json(await repository.listLessons()))
+  router.get('/', async (req, res) => {
+    const query = req.query.q ?? ''
+    if (typeof query !== 'string' || query.length > 100) throw httpError(400, 'Search must be text of at most 100 characters.')
+    res.json(await repository.listLessons({ query }))
+  })
   router.put('/:id', async (req, res) => {
     const id = validateId(req.params.id).toLowerCase()
     if (req.body?.orderId !== undefined) {
