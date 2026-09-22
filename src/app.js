@@ -3,10 +3,12 @@ import { orderRoutes } from './routes/orders.js'
 import { logger } from './middleware/logger.js'
 import { imageMiddleware } from './middleware/images.js'
 import { lessonRoutes } from './routes/lessons.js'
+import { cors } from './middleware/cors.js'
 
-export function createApp({ repository, log = console.log }) {
+export function createApp({ repository, log = console.log, allowedOrigins = ['http://localhost:5173', 'https://zibawaa.github.io'] }) {
   const app = express()
   app.use(logger(log))
+  app.use(cors(allowedOrigins))
   imageMiddleware(app)
   app.use(express.json({ limit: '16kb' }))
   app.use('/lessons', lessonRoutes(repository))
