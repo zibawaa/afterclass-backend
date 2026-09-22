@@ -3,6 +3,7 @@ import { httpError } from '../validation.js'
 import { matchesLesson } from '../search.js'
 
 export function createMongoRepository(db, client) {
+  // This layer translates API operations into native MongoDB driver operations.
   const lessons = db.collection('lessons')
   const orders = db.collection('orders')
   return {
@@ -19,11 +20,13 @@ export function createMongoRepository(db, client) {
     },
     listTeachers: () => db.collection('teachers').find({}).sort({ lastName: 1 }).toArray(),
     async listLessons({ query = '', teacherId = '' } = {}) {
+      // Filter by teacher in MongoDB, then apply the coursework search fields.
       const result = await lessons.find(teacherId ? { teacherId } : {}).toArray()
       return result.filter(lesson => matchesLesson(lesson, query))
     },
     updateLesson: (id, changes) => lessons.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: changes }, { returnDocument: 'after' }),
     async completeOrder(orderId, lessonId, space) {
+      // A transaction updates every selected lesson together or changes nothing.
       const session = client.startSession()
       try {
         return await session.withTransaction(async () => {
@@ -51,6 +54,7 @@ export function createMongoRepository(db, client) {
       }
     },
     async createOrder(input) {
+      // Validate current availability and prepare an idempotent pending order.
       const fingerprint = JSON.stringify({ name: input.name, phone: input.phone, items: input.items })
       const existing = await orders.findOne({ requestId: input.requestId })
       if (existing) {

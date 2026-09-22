@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb'
 
 export async function connectDatabase(env = process.env) {
+  // Read the Atlas URI from environment variables so credentials never enter source control.
   if (!env.MONGODB_URI || !/^mongodb\+srv:\/\/[^/]+\.mongodb\.net(?:\/|\?|$)/.test(env.MONGODB_URI)) {
     throw new Error('Set MONGODB_URI to your MongoDB Atlas SRV connection string in .env.')
   }

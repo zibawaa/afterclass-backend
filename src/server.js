@@ -2,9 +2,11 @@ import { createApp } from './app.js'
 import { connectDatabase } from './database.js'
 import { createMongoRepository } from './repositories/mongo.js'
 
+// Render supplies PORT; 3000 keeps local development simple.
 const port = process.env.PORT || 3000
 try {
   const { client, db } = await connectDatabase()
+  // Keep route code independent from MongoDB by passing it a repository object.
   const repository = createMongoRepository(db, client)
   const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,https://zibawaa.github.io').split(',').map(origin => origin.trim()).filter(Boolean)
   const server = createApp({ repository, allowedOrigins }).listen(port, () => console.log(`AfterClass API listening on port ${port}`))

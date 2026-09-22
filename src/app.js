@@ -7,11 +7,13 @@ import { cors } from './middleware/cors.js'
 import { httpError, validateId } from './validation.js'
 
 export function createApp({ repository, log = console.log, allowedOrigins = ['http://localhost:5173', 'https://zibawaa.github.io'] }) {
+  // Assemble middleware and routes in one testable Express application.
   const app = express()
   app.use(logger(log))
   app.use(cors(allowedOrigins))
   imageMiddleware(app)
   app.use(express.json({ limit: '16kb' }))
+  // Render uses this endpoint to confirm that the API and database are available.
   app.get('/health', async (req, res) => {
     await repository.ping()
     res.json({ status: 'ok' })

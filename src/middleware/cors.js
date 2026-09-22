@@ -1,4 +1,5 @@
 export function cors(allowedOrigins) {
+  // Allow only the local app and the published GitHub Pages origin to call the API.
   return (req, res, next) => {
     const origin = req.get('Origin')
     res.vary('Origin')
