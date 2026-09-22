@@ -16,6 +16,7 @@ export function createApp({ repository, log = console.log, allowedOrigins = ['ht
     res.json({ status: 'ok' })
   })
   app.use('/lessons', lessonRoutes(repository))
+  app.get('/teachers', async (req, res) => res.json(await repository.listTeachers()))
   app.use('/orders', orderRoutes(repository))
   app.use((req, res) => res.status(404).json({ error: 'Route not found.' }))
   app.use((error, req, res, next) => {

@@ -7,8 +7,9 @@ export function createMongoRepository(db, client) {
   const orders = db.collection('orders')
   return {
     ping: () => db.command({ ping: 1 }),
-    async listLessons({ query = '' } = {}) {
-      const result = await lessons.find({}).toArray()
+    listTeachers: () => db.collection('teachers').find({}).sort({ lastName: 1 }).toArray(),
+    async listLessons({ query = '', teacherId = '' } = {}) {
+      const result = await lessons.find(teacherId ? { teacherId } : {}).toArray()
       return result.filter(lesson => matchesLesson(lesson, query))
     },
     updateLesson: (id, changes) => lessons.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: changes }, { returnDocument: 'after' }),

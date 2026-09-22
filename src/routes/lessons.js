@@ -5,8 +5,10 @@ export function lessonRoutes(repository) {
   const router = Router()
   router.get('/', async (req, res) => {
     const query = req.query.q ?? ''
+    const teacherId = req.query.teacher ?? ''
     if (typeof query !== 'string' || query.length > 100) throw httpError(400, 'Search must be text of at most 100 characters.')
-    res.json(await repository.listLessons({ query }))
+    if (typeof teacherId !== 'string' || !/^[a-z0-9-]{0,80}$/.test(teacherId)) throw httpError(400, 'Invalid teacher selection.')
+    res.json(await repository.listLessons({ query, teacherId }))
   })
   router.put('/:id', async (req, res) => {
     const id = validateId(req.params.id).toLowerCase()
