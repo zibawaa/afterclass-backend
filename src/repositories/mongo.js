@@ -5,6 +5,7 @@ export function createMongoRepository(db, client) {
   const lessons = db.collection('lessons')
   const orders = db.collection('orders')
   return {
+    ping: () => db.command({ ping: 1 }),
     listLessons: () => lessons.find({}).toArray(),
     updateLesson: (id, changes) => lessons.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: changes }, { returnDocument: 'after' }),
     async completeOrder(orderId, lessonId, space) {

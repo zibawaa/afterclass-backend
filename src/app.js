@@ -11,6 +11,10 @@ export function createApp({ repository, log = console.log, allowedOrigins = ['ht
   app.use(cors(allowedOrigins))
   imageMiddleware(app)
   app.use(express.json({ limit: '16kb' }))
+  app.get('/health', async (req, res) => {
+    await repository.ping()
+    res.json({ status: 'ok' })
+  })
   app.use('/lessons', lessonRoutes(repository))
   app.use('/orders', orderRoutes(repository))
   app.use((req, res) => res.status(404).json({ error: 'Route not found.' }))
