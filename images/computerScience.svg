@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" role="img" aria-label="Computer Science">
+  <rect width="400" height="260" fill="#1e3a5f"/>
+  <rect x="90" y="40" width="220" height="140" rx="10" fill="#0f1f33" stroke="#7fb3ff" stroke-width="6"/>
+  <text x="120" y="95" font-family="monospace" font-size="28" fill="#7fe0a0">&lt;/&gt;</text>
+  <text x="120" y="135" font-family="monospace" font-size="18" fill="#cfe3ff">print("Hello")</text>
+  <rect x="170" y="180" width="60" height="22" fill="#7fb3ff"/>
+  <rect x="130" y="202" width="140" height="12" rx="6" fill="#7fb3ff"/>
+</svg>

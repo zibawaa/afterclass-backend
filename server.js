@@ -1,5 +1,6 @@
 var express = require("express");
 var cors = require("cors");
+var path = require("path");
 var app = express();
 
 var lessons = [
@@ -19,6 +20,14 @@ app.use(cors());
 app.use(function(request, response, next) {
   console.log("[" + new Date().toISOString() + "] " + request.method + " " + request.url);
   next();
+});
+
+// Static file middleware: serves lesson images from the images folder
+app.use("/images", express.static(path.resolve(__dirname, "images")));
+
+// Reached only if express.static did not find the file
+app.use("/images", function(request, response) {
+  response.status(404).send("Image not found: " + request.url);
 });
 
 app.get("/lessons", function(request, response) {
