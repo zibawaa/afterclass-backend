@@ -15,6 +15,12 @@ var lessons = [
 
 app.use(cors());
 
+// Logger middleware: runs for every request, logs time, method and url, then passes on
+app.use(function(request, response, next) {
+  console.log("[" + new Date().toISOString() + "] " + request.method + " " + request.url);
+  next();
+});
+
 app.get("/lessons", function(request, response) {
   response.json(lessons);
 });
