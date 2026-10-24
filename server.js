@@ -15,9 +15,12 @@ var lessons = [
 
 app.use(cors());
 
-app.use(function(request, response) {
-  console.log("In comes a request to: " + request.url);
+app.get("/lessons", function(request, response) {
   response.json(lessons);
+});
+
+app.use(function(request, response) {
+  response.status(404).send("Page Not Found!");
 });
 
 app.listen(3000, function() {
