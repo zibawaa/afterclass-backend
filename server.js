@@ -15,6 +15,7 @@ var lessons = [
 ];
 
 app.use(cors());
+app.use(express.json());
 
 // Logger middleware: runs for every request, logs time, method and url, then passes on
 app.use(function(request, response, next) {
@@ -32,6 +33,13 @@ app.use("/images", function(request, response) {
 
 app.get("/lessons", function(request, response) {
   response.json(lessons);
+});
+
+app.post("/orders", function(request, response) {
+  var order = request.body;
+  console.log("New order received: name=" + order.name + ", phone=" + order.phone +
+    ", lessonIDs=[" + order.lessonIDs.join(", ") + "], spaces=" + order.spaces);
+  response.json({ message: "Order received", order: order });
 });
 
 app.use(function(request, response) {
