@@ -2,6 +2,10 @@
 
 Express.js REST API for the AfterClass app, using the native MongoDB Node.js driver and MongoDB Atlas.
 
+- Hosted on Render: https://m00932446-after-school.onrender.com
+- Lessons route: https://m00932446-after-school.onrender.com/lessons
+- Front-end repo: https://github.com/zibawaa/afterclass-frontend
+
 ## Configuration
 
 No credentials are stored in this repository. The server reads these environment variables
