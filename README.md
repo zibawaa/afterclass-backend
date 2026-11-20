@@ -21,3 +21,13 @@ No credentials are stored in this repository. The server reads these environment
 
     npm install
     node server.js
+
+## Postman
+
+`postman/AfterClass.postman_collection.json` and `postman/AfterClass-Render.postman_environment.json`
+can be imported into Postman. The collection tests GET /lessons, the static image route (found and
+not found), POST /orders and PUT /lessons/:_id. The environment sets `base_url` to the Render server.
+
+## Database export
+
+With the environment variables set, `node export-db.js` writes each collection to `db-export/`.
